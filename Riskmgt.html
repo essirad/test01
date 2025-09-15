@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Risk Management – Interactive v3.4</title>
+  <style>
+    :root{--bg:#ffffff;--ink:#222;--muted:#6b7280;--br:#e5e7eb;--green:#b7e4a2;--yellow:#ffe082;--orange:#ffb74d;--red:#ef5350;--brand:#ff6f00}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font:14px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell;color:var(--ink);background:var(--bg)}
+    header{padding:16px 20px;border-bottom:1px solid var(--br);display:flex;gap:12px;align-items:center;justify-content:space-between}
+    header h1{font-size:20px;margin:0}
+    .layout{display:grid;grid-template-columns:1.1fr 1.5fr;gap:16px;padding:16px;height:calc(100% - 62px)}
+    .card{border:1px solid var(--br);border-radius:12px;background:#fff;display:flex;flex-direction:column}
+    .card h3{margin:12px 12px 0 12px;font-size:16px}
+
+    .matrix-wrap{position:relative;padding:16px;flex:1;min-height:420px}
+    .matrix-wrap svg{width:100%;height:auto;max-height:560px;display:block}
+    .grid rect{stroke:none}
+    .axis-title{font-weight:700;font-size:13px;fill:#111}
+    .tick{font-size:12px;fill:#374151}
+    .legend{display:flex;gap:10px;padding:0 16px 16px 16px;color:var(--muted)}
+    .legend .sw{width:14px;height:14px;border-radius:3px;border:1px solid #cfd5db}
+
+    .panel{display:flex;flex-direction:column}
+    .toolbar{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:12px;padding:12px;border-bottom:1px solid var(--br);align-items:end}
+    .field{display:flex;flex-direction:column}
+    .field label{font-size:12px;color:var(--muted);margin:0 0 4px 4px}
+    .field .ro{background:#f9fafb;color:#6b7280}
+    .field.full{grid-column:1 / -1}
+    .toolbar input,.toolbar select,.toolbar button{padding:8px 10px;border:1px solid var(--br);border-radius:8px}
+    .toolbar button{background:#111827;color:#fff;cursor:pointer}
+    .toolbar button.secondary{background:#fff;color:#111827}
+    .toolbar button.google{background:#1a73e8;border-color:#1a73e8;color:#fff}
+    .btns{display:flex;gap:8px;flex-wrap:wrap}
+
+    .table-wrap{overflow:auto;flex:1}
+    table{width:100%;border-collapse:collapse}
+    thead th{position:sticky;top:0;background:#f8fafc;border-bottom:1px solid var(--br);text-align:left;padding:10px;font-weight:600}
+    tbody td{border-bottom:1px solid var(--br);padding:10px;vertical-align:top}
+    tbody tr:hover{background:#fbfbfb}
+    .id-chip{display:inline-flex;align-items:center;gap:6px;padding:2px 8px;border-radius:999px;background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;font-weight:600}
+    .date{font-size:12px;color:#6b7280}
+    td.actions button{border:0;background:#f3f4f6;padding:6px 8px;border-radius:6px;cursor:pointer}
+    .deleted td{text-decoration:line-through;color:#9ca3af}
+
+    @media (max-width:1200px){.layout{grid-template-columns:1fr;height:auto}}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.11.1/dist/pptxgen.bundle.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Project risk management</h1>
+    <div class="small">Free drag • History & arrows • Local save</div>
+  </header>
+
+  <div class="layout">
+    <!-- Matrix -->
+    <section class="card" id="matrixCard">
+      <h3>Risk evaluation matrix</h3>
+      <div class="matrix-wrap">
+        <svg id="matrix" viewBox="0 0 520 520" preserveAspectRatio="xMidYMid meet" aria-label="Risk matrix">
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="#6b7280"></path></marker>
+          </defs>
+          <g class="grid" transform="translate(60,60)" shape-rendering="crispEdges">
+            <!-- 4x4 tiles (400x400) -->
+            <rect x="0" y="0" width="100" height="100" fill="var(--yellow)"/>
+            <rect x="100" y="0" width="100" height="100" fill="var(--orange)"/>
+            <rect x="200" y="0" width="100" height="100" fill="var(--orange)"/>
+            <rect x="300" y="0" width="100" height="100" fill="var(--red)"/>
+            <rect x="0" y="100" width="100" height="100" fill="var(--green)"/>
+            <rect x="100" y="100" width="100" height="100" fill="var(--yellow)"/>
+            <rect x="200" y="100" width="100" height="100" fill="var(--orange)"/>
+            <rect x="300" y="100" width="100" height="100" fill="var(--red)"/>
+            <rect x="0" y="200" width="100" height="100" fill="var(--green)"/>
+            <rect x="100" y="200" width="100" height="100" fill="var(--yellow)"/>
+            <rect x="200" y="200" width="100" height="100" fill="var(--orange)"/>
+            <rect x="300" y="200" width="100" height="100" fill="var(--orange)"/>
+            <rect x="0" y="300" width="100" height="100" fill="var(--green)"/>
+            <rect x="100" y="300" width="100" height="100" fill="var(--green)"/>
+            <rect x="200" y="300" width="100" height="100" fill="var(--yellow)"/>
+            <rect x="300" y="300" width="100" height="100" fill="var(--yellow)"/>
+            <!-- single grid -->
+            <rect x="0" y="0" width="400" height="400" fill="none" stroke="#cfd5db"/>
+            <g id="gridLines" vector-effect="non-scaling-stroke"></g>
+            <g id="history"></g>
+            <g id="arrows"></g>
+            <g id="dots"></g>
+          </g>
+          <!-- faint dashed boundary around the matrix area (top-level coords) -->
+          <rect x="60" y="60" width="400" height="400" fill="none" stroke="#9ca3af" stroke-dasharray="6 6" stroke-linecap="round" opacity="0.5" vector-effect="non-scaling-stroke" pointer-events="none" aria-hidden="true"/>
+          <!-- Ticks then title UNDER them -->
+          <g class="tick">
+            <text x="110" y="495" text-anchor="middle">Low</text>
+            <text x="210" y="495" text-anchor="middle">Medium</text>
+            <text x="310" y="495" text-anchor="middle">High</text>
+            <text x="410" y="495" text-anchor="middle">Very high</text>
+            <text x="55" y="110" text-anchor="end">Very high</text>
+            <text x="55" y="210" text-anchor="end">High</text>
+            <text x="55" y="310" text-anchor="end">Medium</text>
+            <text x="55" y="410" text-anchor="end">Low</text>
+          </g>
+          <text x="285" y="515" class="axis-title">Impact</text>
+          <text x="22" y="260" transform="rotate(-90,22,260)" class="axis-title">Probability</text>
+        </svg>
+      </div>
+      <div class="legend small">
+        <div><span class="sw" style="background:var(--green)"></span> Low</div>
+        <div><span class="sw" style="background:var(--yellow)"></span> Moderate</div>
+        <div><span class="sw" style="background:var(--orange)"></span> High</div>
+        <div><span class="sw" style="background:var(--red)"></span> Critical</div>
+      </div>
+    </section>
+
+    <!-- Form + table -->
+    <section class="card panel">
+      <div class="toolbar">
+        <div class="field"><label for="id">ID</label><input id="id" class="ro" placeholder="Auto" readonly /></div>
+        <div class="field"><label for="impact">Impact</label>
+          <select id="impact"><option value="1">Low</option><option value="2">Medium</option><option value="3">High</option><option value="4">Very High</option></select>
+        </div>
+        <div class="field"><label for="prob">Probability</label>
+          <select id="prob"><option value="1">Low</option><option value="2">Medium</option><option value="3">High</option><option value="4">Very High</option></select>
+        </div>
+        <div class="field"><label for="owner">Owner (name)</label><input id="owner" placeholder="Full name" /></div>
+
+        <div class="field full"><label for="desc">Risk description</label><input id="desc" placeholder="Risk description" /></div>
+        <div class="field full"><label for="miti">Mitigation actions</label><input id="miti" placeholder="Mitigation actions" /></div>
+
+        <div class="field actions full"><label>Actions</label>
+          <div class="btns">
+            <button id="addBtn">Add / Update actions</button>
+            <button id="resetEvalBtn" class="secondary" title="Reset risk positions and history">Reset evaluation</button>
+            <button class="google" id="exportSlidesBtn">Export Google Slides</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap">
+        <table id="tbl">
+          <thead>
+            <tr>
+              <th style="width:80px">ID</th>
+              <th>Risk description</th>
+              <th style="width:110px">Impact</th>
+              <th style="width:120px">Probability</th>
+              <th style="width:200px">Owner</th>
+              <th>Mitigation actions</th>
+              <th style="width:160px">Last updated</th>
+              <th style="width:160px">Actions</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+<script type="application/json" id="risksSeed">[
+  {"id":"R1","desc":"End-users & key-users not sufficiently involved","impact":4,"prob":3,"owner":"PM","miti":"Change management plan, videos, training & UAT"},
+  {"id":"R2","desc":"Difficulty to match all qualification data due to poor data quality","impact":4,"prob":2,"owner":"Data lead","miti":"Data cleaning & rules for CPPR ID"},
+  {"id":"R3","desc":"Solution owner for run mode not identified","impact":2,"prob":3,"owner":"Ops","miti":"PIMX for run mode but not defined for industrialization"},
+  {"id":"R4","desc":"Budget to develop full solution or additional evolutions","impact":3,"prob":4,"owner":"CFO","miti":"Reduce some functionalities"}
+]</script>
+
+<script>
+  const matrix=document.getElementById('matrix');
+  const dotsLayer=document.getElementById('dots');
+  const arrowsLayer=document.getElementById('arrows');
+  const historyLayer=document.getElementById('history');
+  const gridLines=document.getElementById('gridLines');
+  // Grid lines inside translated group (0..400)
+  for(let i=0;i<=4;i++){
+    const x=i*100, y=i*100;
+    const v=document.createElementNS('http://www.w3.org/2000/svg','line');
+    v.setAttribute('x1',x); v.setAttribute('y1',0);
+    v.setAttribute('x2',x); v.setAttribute('y2',400);
+    v.setAttribute('stroke','#cfd5db'); v.setAttribute('vector-effect','non-scaling-stroke');
+    gridLines.appendChild(v);
+    const h=document.createElementNS('http://www.w3.org/2000/svg','line');
+    h.setAttribute('x1',0); h.setAttribute('y1',y);
+    h.setAttribute('x2',400); h.setAttribute('y2',y);
+    h.setAttribute('stroke','#cfd5db'); h.setAttribute('vector-effect','non-scaling-stroke');
+    gridLines.appendChild(h);
+  }
+
+  let risks=[];
+  const els={ id:document.getElementById('id'), desc:document.getElementById('desc'), impact:document.getElementById('impact'), prob:document.getElementById('prob'), owner:document.getElementById('owner'), miti:document.getElementById('miti'), tbody:document.querySelector('#tbl tbody') };
+  const labels={1:'Low',2:'Medium',3:'High',4:'Very High'};
+  const center=(c,r)=>({x:60+c*100+50,y:60+r*100+50});
+  const pos=(impact,prob)=>center(impact-1,4-prob);
+  const nowISO=()=>new Date().toISOString().slice(0,19).replace('T',' ');
+
+  function nextId(){ const nums=risks.map(r=>parseInt((r.id||'').replace(/[^0-9]/g,''),10)).filter(n=>!isNaN(n)); const max=nums.length?Math.max(...nums):0; return `R${max+1}`; }
+
+  function upsertRisk(){
+    let id=els.id.value.trim(); if(!id){id=nextId(); els.id.value=id;}
+    const idx=risks.findIndex(x=>x.id.toLowerCase()===id.toLowerCase());
+    if(idx>-1){
+      const curr=risks[idx];
+      curr.desc=(els.desc.value||'').trim();
+      curr.impact=+els.impact.value; curr.prob=+els.prob.value;
+      curr.owner=(els.owner.value||'').trim(); curr.miti=(els.miti.value||'').trim();
+      if(curr.x==null||curr.y==null){ const p=pos(curr.impact,curr.prob); curr.x=p.x; curr.y=p.y; }
+      curr.last=nowISO();
+    } else {
+      const p=pos(+els.impact.value,+els.prob.value);
+      risks.push({ id, desc:(els.desc.value||'').trim(), impact:+els.impact.value, prob:+els.prob.value, owner:(els.owner.value||'').trim(), miti:(els.miti||'').value?els.miti.value.trim():(els.miti.value||'').trim(), x:p.x, y:p.y, last:nowISO() });
+    }
+    render(); saveTemp();
+  }
+
+  function clearForm(){ els.desc.value=''; els.impact.value='2'; els.prob.value='2'; els.miti.value=''; els.owner.value=''; }
+  function toggleDelete(id){ const r=risks.find(x=>x.id===id); if(!r) return; r.deleted=!r.deleted; r.last=nowISO(); render(); saveTemp(); }
+  function editRisk(id){ const r=risks.find(x=>x.id===id); if(!r) return; els.id.value=r.id; els.desc.value=r.desc; els.impact.value=r.impact; els.prob.value=r.prob; els.miti.value=r.miti; els.owner.value=r.owner||''; }
+
+  function render(){
+    els.tbody.innerHTML=risks.map(r=>`<tr class="${r.deleted?'deleted':''}">
+      <td><span class="id-chip">${r.id}</span></td>
+      <td>${escapeHtml(r.desc)}</td>
+      <td>${labels[r.impact]}</td>
+      <td>${labels[r.prob]}</td>
+      <td>${escapeHtml(r.owner||'')}</td>
+      <td>${escapeHtml(r.miti)}</td>
+      <td class="date">${r.last||''}</td>
+      <td class="actions"><button onclick="editRisk('${r.id}')">Edit</button><button onclick="toggleDelete('${r.id}')">${r.deleted?'Restore':'Delete (strikethrough)'}</button></td>
+    </tr>`).join('');
+
+    historyLayer.innerHTML=''; arrowsLayer.innerHTML=''; dotsLayer.innerHTML='';
+    risks.filter(r=>!r.deleted).forEach(r=>{
+      const cur = (r.x!=null&&r.y!=null) ? {x:r.x,y:r.y} : pos(r.impact,r.prob);
+      const g = dot(r.id, cur.x, cur.y, 'var(--brand)'); dotsLayer.appendChild(g);
+      if(r.prevX!=null && r.prevY!=null && (r.prevX!==cur.x || r.prevY!==cur.y)){
+        const past = dot(r.id, r.prevX, r.prevY, '#9ca3af'); historyLayer.appendChild(past);
+        const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+        line.setAttribute('x1', r.prevX); line.setAttribute('y1', r.prevY);
+        line.setAttribute('x2', cur.x);  line.setAttribute('y2', cur.y);
+        line.setAttribute('stroke', '#6b7280'); line.setAttribute('stroke-width','2');
+        line.setAttribute('marker-end', 'url(#arrow)'); arrowsLayer.appendChild(line);
+      }
+    });
+  }
+
+  function dot(id,x,y,color){
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.classList.add('risk-dot'); g.setAttribute('data-id',id);
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',x); c.setAttribute('cy',y); c.setAttribute('r',16); c.setAttribute('fill',color); c.setAttribute('fill-opacity','0.9');
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x',x); t.setAttribute('y',y+5); t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','12'); t.setAttribute('fill','#fff'); t.textContent=id;
+    g.appendChild(c); g.appendChild(t); g.addEventListener('mousedown', startDrag);
+    return g;
+  }
+
+  // Constrained drag: keep dots inside matrix (60..460), accounting for 16px radius
+  let drag=null;
+  function startDrag(e){
+    const g = e.currentTarget; const id = g.getAttribute('data-id');
+    const p = svgPointFromEvent(matrix, e);
+    const c = g.querySelector('circle'); const cx = parseFloat(c.getAttribute('cx')); const cy = parseFloat(c.getAttribute('cy'));
+    drag = { id, dx: p.x - cx, dy: p.y - cy };
+    window.addEventListener('mousemove', onDrag);
+    window.addEventListener('mouseup', endDrag, { once:true });
+  }
+  function onDrag(e){
+    if(!drag) return; const r = risks.find(x=>x.id===drag.id); if(!r) return;
+    const p = svgPointFromEvent(matrix, e);
+    let x = p.x - drag.dx; let y = p.y - drag.dy;
+    x = clamp(x, 60+16, 460-16); y = clamp(y, 60+16, 460-16);
+    moveDot(r.id, x, y);
+  }
+  function endDrag(e){
+    if(!drag) return; const d = drag; drag = null; const r = risks.find(x=>x.id===d.id); if(!r) return;
+    const p = svgPointFromEvent(matrix, e);
+    let x = clamp(p.x - d.dx, 60+16, 460-16); let y = clamp(p.y - d.dy, 60+16, 460-16);
+    r.prevX = (r.x!=null?r.x:pos(r.impact,r.prob).x); r.prevY = (r.y!=null?r.y:pos(r.impact,r.prob).y);
+    r.x = x; r.y = y;
+    const gx = x-60, gy = y-60; const col = Math.min(3, Math.max(0, Math.floor(gx/100))); const row = Math.min(3, Math.max(0, Math.floor(gy/100)));
+    r.prevImpact = r.impact; r.prevProb = r.prob; r.impact = col+1; r.prob = 4-row; r.last=nowISO();
+    render(); saveTemp();
+  }
+
+  function moveDot(id,x,y){ const g=[...dotsLayer.querySelectorAll('g')].find(el=>el.getAttribute('data-id')===id); if(g){ g.querySelector('circle').setAttribute('cx',x); g.querySelector('circle').setAttribute('cy',y); g.querySelector('text').setAttribute('x',x); g.querySelector('text').setAttribute('y',y+5); } }
+  function svgPointFromEvent(svg, e){
+    const rect = svg.getBoundingClientRect(); const vb = svg.viewBox.baseVal;
+    const scale = Math.min(rect.width / vb.width, rect.height / vb.height);
+    const offsetX = (rect.width - vb.width * scale) / 2; const offsetY = (rect.height - vb.height * scale) / 2;
+    const x = (e.clientX - rect.left - offsetX) / scale + vb.x; const y = (e.clientY - rect.top - offsetY) / scale + vb.y;
+    return {x,y};
+  }
+  const clamp=(v,min,max)=>Math.min(Math.max(v,min),max);
+
+  // Click to pre-fill impact/prob (does not move dots)
+  matrix.addEventListener('click',(e)=>{ const p=svgPointFromEvent(matrix,e); const gx=Math.min(Math.max(p.x-60,0),400); const gy=Math.min(Math.max(p.y-60,0),400); const col=Math.floor(gx/100); const row=Math.floor(gy/100); els.impact.value=col+1; els.prob.value=4-row; });
+
+  // Storage
+  function saveTemp(){ localStorage.setItem('risks_v3_4', JSON.stringify(risks)); }
+  function loadTemp(){ const raw=localStorage.getItem('risks_v3_4'); if(raw){ risks=JSON.parse(raw); render(); } }
+  function escapeHtml(s){ const map = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}; return (s||'').replace(/[&<>"']/g, ch => map[ch]); }
+
+  // Seed/init from localStorage or embedded JSON
+  function normalizeRisk(r){ const safeId=(r.id||'').toString().trim()||('R'+(Math.random()*1e5|0)); const impact=Math.min(4,Math.max(1,parseInt(r.impact,10)||1)); const prob=Math.min(4,Math.max(1,parseInt(r.prob,10)||1)); return { id:safeId, desc:(r.desc||'').toString(), impact, prob, owner:(r.owner||'').toString(), miti:(r.miti||'').toString(), x:(typeof r.x==='number'?r.x:null), y:(typeof r.y==='number'?r.y:null), prevX:(typeof r.prevX==='number'?r.prevX:null), prevY:(typeof r.prevY==='number'?r.prevY:null), prevImpact:(typeof r.prevImpact==='number'?r.prevImpact:undefined), prevProb:(typeof r.prevProb==='number'?r.prevProb:undefined), last:r.last||nowISO(), deleted:!!r.deleted }; }
+  function initData(){ try{ const raw=localStorage.getItem('risks_v3_4'); if(raw){ const parsed=JSON.parse(raw); if(Array.isArray(parsed)) risks=parsed; } }catch(e){} if(!Array.isArray(risks)||!risks.length){ const el=document.getElementById('risksSeed'); if(el){ try{ const seed=JSON.parse(el.textContent); if(Array.isArray(seed)) risks=seed; }catch(e){} } } if(!Array.isArray(risks)) risks=[]; risks=risks.map(normalizeRisk); render(); }
+
+  // Export to Google Slides (.pptx)
+  async function svgMatrixToPngDataUrl(){ const src=document.getElementById('matrix'); const clone=src.cloneNode(true); const css=getComputedStyle(document.documentElement); const colorMap={'var(--green)':(css.getPropertyValue('--green')||'#b7e4a2').trim(),'var(--yellow)':(css.getPropertyValue('--yellow')||'#ffe082').trim(),'var(--orange)':(css.getPropertyValue('--orange')||'#ffb74d').trim(),'var(--red)':(css.getPropertyValue('--red')||'#ef5350').trim(),'var(--brand)':(css.getPropertyValue('--brand')||'#ff6f00').trim()}; clone.querySelectorAll('[fill]').forEach(el=>{ const f=el.getAttribute('fill'); if(f&&colorMap[f]) el.setAttribute('fill',colorMap[f]); }); clone.setAttribute('xmlns','http://www.w3.org/2000/svg'); clone.setAttribute('width','1000'); clone.setAttribute('height','1000'); const svgStr=new XMLSerializer().serializeToString(clone); const url='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svgStr); const img=new Image(); img.src=url; await img.decode(); const canvas=document.createElement('canvas'); canvas.width=1000; canvas.height=1000; const ctx=canvas.getContext('2d'); ctx.drawImage(img,0,0); return canvas.toDataURL('image/png'); }
+  async function exportToSlides(){ try{ const png=await svgMatrixToPngDataUrl(); if(window.PptxGenJS){ const pptx=new PptxGenJS(); pptx.title='Risk Matrix Export'; pptx.author='Risk Tool'; let s1=pptx.addSlide(); s1.addText('Risk Matrix',{x:0.5,y:0.3,fontSize:20,bold:true}); s1.addImage({data:png,x:0.5,y:0.8,w:5.2,h:5.2}); const headers=['ID','Description','Impact','Prob.','Owner','Mitigation']; const rows=[ headers.map(h=>({text:h,options:{bold:true,fill:'F2F2F2'}})) ]; risks.filter(r=>!r.deleted).forEach(r=>{ rows.push([ r.id, r.desc||'', labels[r.impact], labels[r.prob], r.owner||'', r.miti||'' ]); }); let s2=pptx.addSlide(); s2.addText('Risk Register',{x:0.5,y:0.3,fontSize:20,bold:true}); s2.addTable(rows,{x:0.5,y:0.8,w:9.0,fontSize:12,color:'363636',border:{type:'solid',pt:0.75,color:'BFBFBF'},autoPage:true,autoPageRepeatHeader:true}); const fn='Risk_Matrix_'+new Date().toISOString().slice(0,10)+'.pptx'; await pptx.writeFile({fileName:fn}); } else { const a=document.createElement('a'); a.href=png; a.download='Risk_Matrix_'+new Date().toISOString().slice(0,10)+'.png'; a.click(); alert('PptxGenJS not loaded. Downloaded PNG fallback.'); } } catch(err){ console.error(err); alert('Export failed: '+(err&&err.message?err.message:err)); } }
+
+  // Buttons
+  document.getElementById('addBtn').addEventListener('click', upsertRisk);
+  document.getElementById('resetEvalBtn').addEventListener('click', ()=>{ risks.forEach(r=>{ r.prevX=null; r.prevY=null; r.x=null; r.y=null; r.prevImpact=undefined; r.prevProb=undefined; r.last=nowISO(); }); render(); saveTemp(); });
+  document.getElementById('exportSlidesBtn').addEventListener('click', exportToSlides);
+
+  // Init
+  document.getElementById('desc').focus();
+  initData();
+</script>
+</body>
+</html>
